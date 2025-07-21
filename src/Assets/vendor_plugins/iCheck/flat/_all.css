@@ -1,0 +1,88 @@
+/* iCheck plugin Flat skin
+----------------------------------- */
+/* Base styles for all variants */
+.icheckbox_flat,
+.iradio_flat,
+[class*="icheckbox_flat-"],
+[class*="iradio_flat-"] {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    border: none;
+    cursor: pointer;
+    background-repeat: no-repeat;
+}
+
+/* Default skin */
+.icheckbox_flat,
+.iradio_flat {
+    background-image: url(flat.png);
+}
+
+.icheckbox_flat { background-position: 0 0; }
+.icheckbox_flat.checked { background-position: -22px 0; }
+.icheckbox_flat.disabled { 
+    background-position: -44px 0;
+    cursor: default;
+}
+.icheckbox_flat.checked.disabled { background-position: -66px 0; }
+
+.iradio_flat { background-position: -88px 0; }
+.iradio_flat.checked { background-position: -110px 0; }
+.iradio_flat.disabled {
+    background-position: -132px 0;
+    cursor: default;
+}
+.iradio_flat.checked.disabled { background-position: -154px 0; }
+
+/* Color variants */
+.icheckbox_flat-red, .iradio_flat-red { background-image: url(red.png); }
+.icheckbox_flat-green, .iradio_flat-green { background-image: url(green.png); }
+.icheckbox_flat-blue, .iradio_flat-blue { background-image: url(blue.png); }
+.icheckbox_flat-aero, .iradio_flat-aero { background-image: url(aero.png); }
+.icheckbox_flat-grey, .iradio_flat-grey { background-image: url(grey.png); }
+.icheckbox_flat-orange, .iradio_flat-orange { background-image: url(orange.png); }
+.icheckbox_flat-yellow, .iradio_flat-yellow { background-image: url(yellow.png); }
+.icheckbox_flat-pink, .iradio_flat-pink { background-image: url(pink.png); }
+.icheckbox_flat-purple, .iradio_flat-purple { background-image: url(purple.png); }
+
+/* Common states for all colors */
+[class*="icheckbox_flat-"] { background-position: 0 0; }
+[class*="icheckbox_flat-"].checked { background-position: -22px 0; }
+[class*="icheckbox_flat-"].disabled { 
+    background-position: -44px 0;
+    cursor: default;
+}
+[class*="icheckbox_flat-"].checked.disabled { background-position: -66px 0; }
+
+[class*="iradio_flat-"] { background-position: -88px 0; }
+[class*="iradio_flat-"].checked { background-position: -110px 0; }
+[class*="iradio_flat-"].disabled {
+    background-position: -132px 0;
+    cursor: default;
+}
+[class*="iradio_flat-"].checked.disabled { background-position: -154px 0; }
+
+/* Retina support */
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+       only screen and (-moz-min-device-pixel-ratio: 1.5),
+       only screen and (-o-min-device-pixel-ratio: 3/2),
+       only screen and (min-device-pixel-ratio: 1.5) {
+    [class*="icheckbox_flat-"],
+    [class*="iradio_flat-"] {
+        background-size: 176px 22px;
+    }
+    
+    .icheckbox_flat-red, .iradio_flat-red { background-image: url(red@2x.png); }
+    .icheckbox_flat-green, .iradio_flat-green { background-image: url(green@2x.png); }
+    .icheckbox_flat-blue, .iradio_flat-blue { background-image: url(blue@2x.png); }
+    .icheckbox_flat-aero, .iradio_flat-aero { background-image: url(aero@2x.png); }
+    .icheckbox_flat-grey, .iradio_flat-grey { background-image: url(grey@2x.png); }
+    .icheckbox_flat-orange, .iradio_flat-orange { background-image: url(orange@2x.png); }
+    .icheckbox_flat-yellow, .iradio_flat-yellow { background-image: url(yellow@2x.png); }
+    .icheckbox_flat-pink, .iradio_flat-pink { background-image: url(pink@2x.png); }
+    .icheckbox_flat-purple, .iradio_flat-purple { background-image: url(purple@2x.png); }
+}
