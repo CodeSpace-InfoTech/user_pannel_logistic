@@ -24,7 +24,7 @@ const LoadsCreateDialog = () => {
 
   const { formData, setFormData, errors, addCargo, removeCargo, handleSubmit, handleClose } = useLoadForm(dialogueData, isOpen, dispatch);
 
-console.log('formData', formData)
+
 
    useEffect(() => {
       feather.replace();
@@ -44,7 +44,7 @@ console.log('formData', formData)
     }));
   }, [dispatch]);
 
-  console.log('formData', formData.cargo)
+
   return (
     <Dialog
       fullScreen
@@ -111,12 +111,17 @@ console.log('formData', formData)
             <div className="col-12 mt-4">
               <h5 className="fw-bold border-bottom pb-2">Delivery Details</h5>
             </div>
-            <LocationInputs
-              type="delivery"
-              data={formData.delivery}
-              setFormData={setFormData}
-              errors={errors}
-            />
+            {
+              formData.delivery && (
+                <LocationInputs
+                 formData={formData}
+                type="delivery"
+                data={formData.delivery}
+                setFormData={setFormData}
+                errors={errors}
+                />
+            )}
+            
 
             <div className="col-12 mt-4">
 

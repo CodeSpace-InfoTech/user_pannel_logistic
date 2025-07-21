@@ -113,7 +113,7 @@ dispatch((updateProfile({
             setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
-            setTimeout(() =>   navigate('/login'),2000)
+            setTimeout(() => navigate('/login'),2000)
           
         }).catch(err => {
             setError(err.message || 'Failed to update password');

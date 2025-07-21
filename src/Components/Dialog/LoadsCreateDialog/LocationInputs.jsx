@@ -1,4 +1,13 @@
-export const LocationInputs = ({ type, data, setFormData, errors ,formData}) => (
+export const LocationInputs = ({ type, data, setFormData, errors ,formData}) =>{
+  
+
+  console.log('type', type)
+  console.log('data', data)
+  console.log('formData', formData)
+  console.log('errors', errors)
+  return (
+
+ 
   <>
     {['address', 'city', 'state', 'zipCode'].map((field, idx) => (
       <div className="col-md-6" key={idx}>
@@ -84,4 +93,4 @@ export const LocationInputs = ({ type, data, setFormData, errors ,formData}) => 
       )}
     </div>
   </>
-);
+)};

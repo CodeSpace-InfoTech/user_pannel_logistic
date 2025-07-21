@@ -77,6 +77,7 @@ export const assignLoadsToEmployees = createAsyncThunk(
   
     const response = await api.put(`${API_URL}/${loadId}/assign`, { employeeIds ,status:"assigned" });
     if(response.data.success) {
+      console.log('response.data.data', response.data.data)
       return response.data.data;
     }
   }

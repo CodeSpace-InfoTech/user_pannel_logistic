@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createLoad, deleteLoad, getLoadDetails, getLoads, updateLoad } from "../loads";
+import { assignLoadsToEmployees, createLoad, deleteLoad, getLoadDetails, getLoads, updateLoad } from "../loads";
 
 const loadSlice = createSlice({
   name: 'loads',
@@ -53,8 +53,17 @@ const loadSlice = createSlice({
       }).addCase(getLoadDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      }).addCase(assignLoadsToEmployees.pending, (state) => {
+        state.loading = true;
       })
-  },
-});
+      .addCase(assignLoadsToEmployees.fulfilled, (state, action) => { 
+        state.loading = false;
+        state.loads = state.loads.map(load => 
+          load._id === action.payload._id ? action.payload : load
+        )
+        }
+  ).addCase(assignLoadsToEmployees.rejected, (state, action) => {
+        state.loading = false;  });}
+})
 
 export default loadSlice.reducer;

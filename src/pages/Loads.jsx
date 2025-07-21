@@ -61,10 +61,13 @@ const Loads = () => {
   };
 
   const handleAssignLoad = (load) => {
+    if(load.status == 'pending' ) {
+     
     setAssignDialogue(true);
 
     dispatch(openDialog({ type: 'assignLoad', data: load }));
-  };
+  } else {
+      toast.error('You can only assign pending loads');}};
 
   const handleDeleteLoad = (id) => {
     Swal.fire({
@@ -131,7 +134,7 @@ const Loads = () => {
                         <th>Rate</th>
                         <th>Equipment</th>
                         <th>Assign</th>
-                        <th>Action</th>
+                        <th>Edit</th>
                         <th>View</th>
                       </tr>
                     </thead>
@@ -157,7 +160,9 @@ const Loads = () => {
                             <span className={`badge ${
                               load.status === 'delivered' ? 'bg-success' :
                               load.status === 'in_transit' ? 'bg-primary' :
-                              load.status === 'pending' ? 'bg-warning' :
+                              load.status === 'pending' ? 'bg-warning' : 
+                              load.status === 'cancelled' ? 'bg-danger' :
+                              load.status === 'assigned' ? 'bg-secondary' :
                               'bg-info'
                             }`}>
                               {load.status?.charAt(0).toUpperCase() + load.status?.slice(1)}
@@ -181,12 +186,12 @@ const Loads = () => {
                               >
                                 <i data-feather="edit" className="w-3 h-3"></i>
                               </button>
-                              <button
+                              {/* <button
                                 className="btn btn-outline-danger btn-sm"
                                 onClick={() => handleDeleteLoad(load._id)}
                               >
                                 <i data-feather="trash-2" className="w-3 h-3"></i>
-                              </button>
+                              </button> */}
                             </div>
                           </td>
                           <td>
@@ -222,7 +227,7 @@ const Loads = () => {
           <LoadsCreateDialog />
         )
         }
-        <AssignLoads />
+  
       </section>
     </>
   );
