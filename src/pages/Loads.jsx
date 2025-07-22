@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import LoadsCreateDialog from '../Components/Dialog/LoadsCreateDialog/LoadsCreateDialog';
 import { toast } from 'react-toastify';
 import AssignLoads from '../Components/Dialog/AssignLoads';
+import $ from 'jquery';
 
 const Loads = () => {
   const {loads, totalLoads} = useSelector(state => state.loads);
@@ -20,11 +21,24 @@ const Loads = () => {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [search, setSearch] = useState('');
-  const [Status, setStatus] = useState("");
+  const [status, setStatus] = useState("");
   const [assignDialogue ,setAssignDialogue]=useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     feather.replace();
+    
+    // Add click event listener to document to close dropdown when clicking outside
+    $(document).on('click', (e) => {
+      if (!$(e.target).closest('.dropdown').length) {
+        setIsDropdownOpen(false);
+      }
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      $(document).off('click');
+    };
   }, [loads]);
   
   const dispatch = useDispatch();
@@ -35,7 +49,7 @@ const Loads = () => {
       sortBy,
       sortOrder,
       search,
-      status: Status
+      status
     }))
       .then(response => {
         console.log(response);
@@ -43,12 +57,17 @@ const Loads = () => {
       .catch(error => {
         console.error('Error fetching loads:', error);
       });
-  }, [dispatch, page, rowsPerPage, sortBy, sortOrder, search, Status]);
+  }, [dispatch, page, rowsPerPage, sortBy, sortOrder, search, status]);
   const navigate = useNavigate();
 
   const handleAddLoad = () => {
     setAssignDialogue(false);
     dispatch(openDialog({ type: 'loadsCreate', data: null }));
+  };
+
+  const toggleDropdown = (e) => {
+    e.stopPropagation(); // Prevent event from bubbling up
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleEditLoad = (load) => {
@@ -99,6 +118,11 @@ const Loads = () => {
     navigate("load-details");
   }
 
+  const handleStatusSelect = (status) => {
+    setStatus(status);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <>
       <TableHeader title="Loads Tables" />
@@ -106,14 +130,47 @@ const Loads = () => {
         <div className="row">
           <div className="col-12">
             <div className="box">
-              <div className="box-header d-flex justify-content-end">
+              <div className="box-header align-items-center d-flex justify-content-between">
+                <div>
+                <div className={`dropdown ${isDropdownOpen ? 'show' : ''}`}>
+                   <button 
+                     className={`btn btn-rounded btn-primary dropdown-toggle ${isDropdownOpen ? 'show' : ''}`} 
+                     type="button" 
+                     onClick={toggleDropdown}
+                   >
+                     {status ? status : 'Status'}
+                   </button>
+                   <div className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
+                     <Link className="dropdown-item" onClick={() => handleStatusSelect("")}>
+                       All
+                     </Link>
+                     <Link className="dropdown-item" onClick={() => handleStatusSelect("pending")}>
+                      Pending
+                     </Link>
+                     <Link className="dropdown-item" onClick={() => handleStatusSelect("cancelled")}>
+                     Cancelled
+                     </Link>
+                     <Link className="dropdown-item" onClick={() => handleStatusSelect("completed")}>
+                    Completed
+                     </Link>
+                     <Link className="dropdown-item" onClick={() => handleStatusSelect("delivered")}>
+                      Delivered
+                     </Link>
+                     <Link className="dropdown-item" onClick={() => handleStatusSelect("assigned")}>
+                       Assign
+                     </Link>
+                   </div>
+                </div>
+                </div>
+                <div>
                 <button
                   type="button"
-                  className="btn btn-primary mt-10"
+                  className="btn btn-primary "
                   onClick={handleAddLoad}
                 >
                   Add Load
                 </button>
+                </div>
               </div>
               <div className="box-body">
                 <div className="table-responsive">
@@ -143,7 +200,7 @@ const Loads = () => {
                         <tr key={load._id}>
                           <td>{(page * rowsPerPage) + (ind + 1)}</td>
                           <td>{load.loadNumber}</td>
-                          <td>{load.customerData?.name}</td>
+                          <td>{load.customerData?.name ? load.customerData?.name :load.customer?.name}</td>
                           <td>{`${load.pickup?.location?.city}, ${load.pickup?.location?.state}`}</td>
                           <td>{`${load.delivery?.location?.city}, ${load.delivery?.location?.state}`}</td>
                           <td>
