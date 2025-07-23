@@ -7,10 +7,12 @@ const API_URL = '/loads';
 // Get all loads
 export const getLoads = createAsyncThunk(
   'loads/getLoads',
-  async ({ search = '', page = 1, limit = 10, status = '' } = {}) => {
+  async ({ search = '', page = 1, limit = 10, status = '', startDate = '', endDate = '' } = {}) => {
     const queryParams = new URLSearchParams({
       ...(search && { search }),
       ...(status && { status }),
+      ...(startDate && { startDate }),
+      ...(endDate && { endDate }),
       page: page.toString(),
       limit: limit.toString()
     });

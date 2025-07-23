@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { openDialog } from '../redux/slices/dialogSlice';
 import Swal from 'sweetalert2';
+import { enUS } from 'date-fns/locale';
 import feather from "feather-icons";
 import { deleteLoad } from '../redux/loads';
 import { getLoads } from '../redux/loads';
@@ -13,6 +14,9 @@ import LoadsCreateDialog from '../Components/Dialog/LoadsCreateDialog/LoadsCreat
 import { toast } from 'react-toastify';
 import AssignLoads from '../Components/Dialog/AssignLoads';
 import $ from 'jquery';
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
+import { DateRangePicker } from 'react-date-range';
 
 const Loads = () => {
   const {loads, totalLoads} = useSelector(state => state.loads);
@@ -24,24 +28,49 @@ const Loads = () => {
   const [status, setStatus] = useState("");
   const [assignDialogue ,setAssignDialogue]=useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [data, setData] = useState([]);
+  const [date, setDate] = useState([]);
+  const [startDate, setStartDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+ 
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  useEffect(() => {
+    setData(loads);
+  },[loads])
 
   useEffect(() => {
     feather.replace();
     
-    // Add click event listener to document to close dropdown when clicking outside
     $(document).on('click', (e) => {
       if (!$(e.target).closest('.dropdown').length) {
         setIsDropdownOpen(false);
       }
     });
 
-    // Cleanup listener on component unmount
     return () => {
       $(document).off('click');
     };
   }, [loads]);
   
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (date.length === 0) {
+      setDate([
+        {
+          startDate: new Date(),
+          endDate: new Date(),
+          key: "selection",
+        },
+      ]);
+    }
+    $("#datePicker").removeClass("show");
+    setData(loads);
+  }, [date, loads]);
+
   useEffect(() => {
     dispatch(getLoads({
       page: page + 1,
@@ -49,6 +78,8 @@ const Loads = () => {
       sortBy,
       sortOrder,
       search,
+      startDate: dayjs(startDate).format('YYYY-MM-DD'),
+      endDate: dayjs(endDate).format('YYYY-MM-DD'),
       status
     }))
       .then(response => {
@@ -58,6 +89,7 @@ const Loads = () => {
         console.error('Error fetching loads:', error);
       });
   }, [dispatch, page, rowsPerPage, sortBy, sortOrder, search, status]);
+
   const navigate = useNavigate();
 
   const handleAddLoad = () => {
@@ -66,7 +98,7 @@ const Loads = () => {
   };
 
   const toggleDropdown = (e) => {
-    e.stopPropagation(); // Prevent event from bubbling up
+    e.stopPropagation();
     setIsDropdownOpen(!isDropdownOpen);
   };
 
@@ -81,12 +113,12 @@ const Loads = () => {
 
   const handleAssignLoad = (load) => {
     if(load.status == 'pending' ) {
-     
-    setAssignDialogue(true);
-
-    dispatch(openDialog({ type: 'assignLoad', data: load }));
-  } else {
-      toast.error('You can only assign pending loads');}};
+      setAssignDialogue(true);
+      dispatch(openDialog({ type: 'assignLoad', data: load }));
+    } else {
+      toast.error('You can only assign pending loads');
+    }
+  };
 
   const handleDeleteLoad = (id) => {
     Swal.fire({
@@ -123,44 +155,63 @@ const Loads = () => {
     setIsDropdownOpen(false);
   };
 
+  const toggleDatePicker = () => {
+    setIsDatePickerOpen(!isDatePickerOpen);
+  }
+
   return (
     <>
       <TableHeader title="Loads Tables" />
       <section className="content" >
         <div className="row">
           <div className="col-12">
-            <div className="box">
+            <div className="box h-screen">
               <div className="box-header align-items-center d-flex justify-content-between">
                 <div>
-                <div className={`dropdown ${isDropdownOpen ? 'show' : ''}`}>
-                   <button 
-                     className={`btn btn-rounded btn-primary dropdown-toggle ${isDropdownOpen ? 'show' : ''}`} 
-                     type="button" 
-                     onClick={toggleDropdown}
-                   >
-                     {status ? status : 'Status'}
-                   </button>
-                   <div className={`dropdown-menu ${isDropdownOpen ? 'show' : ''}`}>
-                     <Link className="dropdown-item" onClick={() => handleStatusSelect("")}>
-                       All
-                     </Link>
-                     <Link className="dropdown-item" onClick={() => handleStatusSelect("pending")}>
-                      Pending
-                     </Link>
-                     <Link className="dropdown-item" onClick={() => handleStatusSelect("cancelled")}>
-                     Cancelled
-                     </Link>
-                     <Link className="dropdown-item" onClick={() => handleStatusSelect("completed")}>
-                    Completed
-                     </Link>
-                     <Link className="dropdown-item" onClick={() => handleStatusSelect("delivered")}>
-                      Delivered
-                     </Link>
-                     <Link className="dropdown-item" onClick={() => handleStatusSelect("assigned")}>
-                       Assign
-                     </Link>
-                   </div>
-                </div>
+                   <div className="date-picker-container position-relative">
+                    <button 
+                      className="btn btn-primary"
+                      onClick={toggleDatePicker}
+                    >
+                      {dayjs(startDate).format('YYYY-MM-DD')} - {dayjs(endDate).format('YYYY-MM-DD')}
+                    </button>
+                    {isDatePickerOpen && (
+                      <div className="position-absolute" style={{zIndex: 1000}}>
+                        <DateRangePicker
+                          onChange={(item) => {
+                            if (dayjs(item.selection.startDate).isAfter(tomorrow) || 
+                                dayjs(item.selection.endDate).isAfter(tomorrow)) {
+                              toast.error("Cannot select future dates");
+                              return;
+                            }
+                            
+                            setDate([item.selection]);
+                            const dayStart = dayjs(item.selection.startDate).format('YYYY-MM-DD');
+                            const dayEnd = dayjs(item.selection.endDate).format('YYYY-MM-DD');
+                            setPage(0);
+                            setStartDate(dayStart);
+                            setEndDate(dayEnd);
+                            dispatch(getLoads({
+                              page: 0,
+                              limit: rowsPerPage,
+                              sortBy,
+                              sortOrder,
+                              search,
+                              startDate: dayStart,
+                              endDate: dayEnd,
+                              status
+                            }))
+                          }}
+                          showSelectionPreview={true}
+                          moveRangeOnFirstSelection={false}
+                          ranges={date}
+                          direction="horizontal"
+                          locale={enUS}
+                          maxDate={tomorrow}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                 <button
@@ -183,13 +234,14 @@ const Loads = () => {
                         <th>No</th>
                         <th>Load Number</th>
                         <th>Customer</th>
-                        <th>Origin</th>
-                        <th>Destination</th>
+                        {/* <th>Origin</th> */}
+                        {/* <th>Destination</th> */}
                         <th>Pickup Date/Time</th>
                         <th>Delivery Date/Time</th>
                         <th>Status</th>
-                        <th>Rate</th>
+                        {/* <th>Rate</th> */}
                         <th>Equipment</th>
+                        <th>clockIn</th>
                         <th>Assign</th>
                         <th>Edit</th>
                         <th>View</th>
@@ -200,18 +252,18 @@ const Loads = () => {
                         <tr key={load._id}>
                           <td>{(page * rowsPerPage) + (ind + 1)}</td>
                           <td>{load.loadNumber}</td>
-                          <td>{load.customerData?.name ? load.customerData?.name :load.customer?.name}</td>
-                          <td>{`${load.pickup?.location?.city}, ${load.pickup?.location?.state}`}</td>
+                          {/* <td>{load.customerData?.name ? load.customerData?.name :load.customer?.name}</td> */}
+                          {/* <td>{`${load.pickup?.location?.city}, ${load.pickup?.location?.state}`}</td> */}
                           <td>{`${load.delivery?.location?.city}, ${load.delivery?.location?.state}`}</td>
                           <td>
-                            {dayjs(load.pickup?.date).format('MMM D, YYYY')}
+                            {dayjs(load.pickup?.date).format('YYYY-MM-DD')}
                             <br />
-                            {`${dayjs(load.pickup?.timeWindow?.start).format('h:mm A')} - ${dayjs(load.pickup?.timeWindow?.end).format('h:mm A')}`}
+                            {`${dayjs(load.pickup?.timeWindow?.start).format('HH:mm')} - ${dayjs(load.pickup?.timeWindow?.end).format('HH:mm')}`}
                           </td>
                           <td>
-                            {dayjs(load.delivery?.date).format('MMM D, YYYY')}
+                            {dayjs(load.delivery?.date).format('YYYY-MM-DD')}
                             <br />
-                            {`${dayjs(load.delivery?.timeWindow?.start).format('h:mm A')} - ${dayjs(load.delivery?.timeWindow?.end).format('h:mm A')}`}
+                            {`${dayjs(load.delivery?.timeWindow?.start).format('HH:mm')} - ${dayjs(load.delivery?.timeWindow?.end).format('HH:mm')}`}
                           </td>
                           <td>
                             <span className={`badge ${
@@ -225,8 +277,13 @@ const Loads = () => {
                               {load.status?.charAt(0).toUpperCase() + load.status?.slice(1)}
                             </span>
                           </td>
-                          <td>${load.price?.amount}</td>
+                          {/* <td>${load.price?.amount}</td> */}
                           <td>{load.equipment?.toUpperCase()}</td>
+                          <td>
+                            <button  onClick={() => handleAssignLoad(load)} className="btn btn-outline-success btn-sm me-2">
+<i data-feather="clock" className="w-3 h-3"></i> 
+                            </button>
+                          </td>
                           <td>
                             <button 
                               className="btn btn-outline-warning btn-sm me-2"
@@ -243,12 +300,6 @@ const Loads = () => {
                               >
                                 <i data-feather="edit" className="w-3 h-3"></i>
                               </button>
-                              {/* <button
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={() => handleDeleteLoad(load._id)}
-                              >
-                                <i data-feather="trash-2" className="w-3 h-3"></i>
-                              </button> */}
                             </div>
                           </td>
                           <td>
@@ -284,7 +335,6 @@ const Loads = () => {
           <LoadsCreateDialog />
         )
         }
-  
       </section>
     </>
   );

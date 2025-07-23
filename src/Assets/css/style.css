@@ -26815,6 +26815,8 @@ textarea.form-control {
     .small-box p {
       font-size: 0.8571rem; } }
 .box {
+  min-height: 70vh;
+  height: auto;
   position: relative;
   margin-bottom: 1.5rem;
   width: 100%;
