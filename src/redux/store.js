@@ -7,6 +7,7 @@ import employeeReducer from './slices/employees';
 import customerReducer from './slices/customer';
 import loadReducer from './slices/loadsSlice';
 import userReducer from './slices/userSlice';
+import timeLogReducer from './slices/timelogSlice';
 
 const persistConfig = {
   key: 'root',
@@ -24,6 +25,7 @@ export const store = configureStore({
     customer:customerReducer,
     loads:loadReducer,
     users:userReducer,
+    timeLogs:timeLogReducer,
   },
 });
 

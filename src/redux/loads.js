@@ -17,6 +17,7 @@ export const getLoads = createAsyncThunk(
       limit: limit.toString()
     });
     
+   
     const response = await api.get(`${API_URL}?${queryParams}`);
     if(response.data.success) {
       console.log('response.data', response.data.data)
@@ -84,3 +85,36 @@ export const assignLoadsToEmployees = createAsyncThunk(
     }
   }
 );
+
+export const clockInEmployees = createAsyncThunk(
+  'loads/clockInEmployees',
+  async ({ loadId, employeeIds, activityType }) => {
+    const response = await api.post('/time-logs/clock-in', {
+      loadId,
+      employeeIds,
+      activityType
+    });
+    if(response.data.success) {
+      console.log('response.data.message', response.data.message)
+      toast.success('Employees clocked in successfully');
+      return response.data.message;
+    }
+  }
+);
+
+export const clockOutEmployees = createAsyncThunk(
+  'loads/clockOutEmployees',
+  async ({ loadId, employeeIds, activityType }) => {
+    const response = await api.put('/time-logs/clock-out', {
+      loadId,
+      employeeIds,
+      activityType
+    });
+    if(response.data.success) {
+      console.log('response.data', response.data)
+      toast.success('Employees clocked out successfully');
+      return response.data.message;
+    }
+  }
+);
+

@@ -25,6 +25,7 @@
     "multiselect-react-dropdown": "^2.0.25",
     "react": "^18.2.0",
     "react-apexcharts": "^1.7.0",
+    "react-bootstrap-daterangepicker": "^8.0.0",
     "react-custom-scrollbars": "^4.2.1",
     "react-date-range": "^2.0.1",
     "react-dom": "^18.2.0",
